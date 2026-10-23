@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_home_gradient"
@@ -18,18 +19,24 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:includeFontPadding="false"
+        android:letterSpacing="0.01"
         android:text="@string/voice_clone_title"
-        android:textColor="@color/warm_text_primary"
-        android:textSize="28sp"
+        android:textColor="@color/home_title_orange"
+        android:textSize="40sp"
         android:textStyle="bold" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif"
+        android:lineSpacingExtra="4dp"
         android:text="@string/voice_clone_subtitle"
-        android:textColor="@color/warm_text_secondary"
-        android:textSize="17sp" />
+        android:textColor="@color/home_subtitle_orange"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tvStatus"
@@ -86,6 +93,77 @@
         android:textColor="@color/warm_button_primary"
         android:textSize="40sp"
         android:textStyle="bold" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="2dp">
+
+        <ProgressBar
+            android:id="@+id/recordProgress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:contentDescription="录音进度"
+            android:indeterminate="false"
+            android:max="30"
+            android:progress="0"
+            android:progressBackgroundTint="@color/warm_button_secondary_stroke"
+            android:progressTint="@color/warm_button_primary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/recordNode10"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:background="@drawable/shape_record_marker"
+            android:importantForAccessibility="no"
+            app:layout_constraintBottom_toBottomOf="@id/recordProgress"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.3333"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/recordProgress" />
+
+        <View
+            android:id="@+id/recordNode20"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:background="@drawable/shape_record_marker"
+            android:importantForAccessibility="no"
+            app:layout_constraintBottom_toBottomOf="@id/recordProgress"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.6667"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/recordProgress" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="10秒"
+            android:textColor="@color/warm_text_secondary"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.3333"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recordProgress" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="20秒"
+            android:textColor="@color/warm_text_secondary"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.6667"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recordProgress" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/tvRecordScript"

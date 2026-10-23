@@ -47,6 +47,7 @@ class VoiceCloneSetupActivity : BaseActivity() {
             }
             val elapsed = (SystemClock.elapsedRealtime() - recordStartedAtMs).coerceAtLeast(0L)
             binding.tvRecordTime.text = getString(R.string.voice_clone_record_time, formatDuration(elapsed))
+            binding.recordProgress.progress = (elapsed / 1000L).toInt().coerceIn(0, 30)
             if (elapsed >= MAX_RECORDING_MS) {
                 stopRecording(true)
                 return
@@ -97,6 +98,7 @@ class VoiceCloneSetupActivity : BaseActivity() {
             if (currentRecording != null) {
                 currentRecording?.file?.delete()
                 currentRecording = null
+                binding.recordProgress.progress = 0
                 updateUi()
             } else {
                 requestPermission(arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO)
@@ -105,6 +107,8 @@ class VoiceCloneSetupActivity : BaseActivity() {
 
         binding.tvRecordScript.text = getString(R.string.voice_clone_record_script)
         binding.tvRecordTime.text = getString(R.string.voice_clone_record_time, formatDuration(0L))
+        binding.recordProgress.max = 30
+        binding.recordProgress.progress = 0
         updateUi()
     }
 
@@ -133,6 +137,7 @@ class VoiceCloneSetupActivity : BaseActivity() {
             isRecording = true
             recordStartedAtMs = SystemClock.elapsedRealtime()
             binding.tvRecordTime.text = getString(R.string.voice_clone_record_time, formatDuration(0L))
+            binding.recordProgress.progress = 0
             mainHandler.removeCallbacks(recordTicker)
             mainHandler.post(recordTicker)
             updateUi()
@@ -155,9 +160,11 @@ class VoiceCloneSetupActivity : BaseActivity() {
             if (recording.durationMs < MIN_RECORDING_MS) {
                 recording.file.delete()
                 currentRecording = null
+                binding.recordProgress.progress = 0
                 Toast.makeText(mContext, R.string.voice_clone_record_too_short, Toast.LENGTH_SHORT).show()
             } else {
                 currentRecording = recording
+                binding.recordProgress.progress = (recording.durationMs / 1000L).toInt().coerceIn(0, 30)
                 if (autoStopped) {
                     Toast.makeText(mContext, R.string.voice_clone_record_auto_stopped, Toast.LENGTH_SHORT).show()
                 } else if (recording.durationMs < RECOMMENDED_RECORDING_MS) {
