@@ -2,7 +2,7 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/warm_bg"
+    android:background="@drawable/bg_home_gradient"
     android:fillViewport="true">
 
     <LinearLayout
@@ -15,7 +15,6 @@
             android:id="@+id/homeHero"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_home_gradient"
             android:orientation="vertical"
             android:paddingTop="32dp"
             android:paddingBottom="18dp">
