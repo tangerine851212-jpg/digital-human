@@ -32,7 +32,7 @@
             android:includeFontPadding="false"
             android:letterSpacing="0.01"
             android:text="@string/device_settings_title"
-            android:textColor="@color/home_title_orange"
+            android:textColor="@color/warm_text_primary"
             android:textSize="40sp"
             android:textStyle="bold" />
 
@@ -43,7 +43,7 @@
             android:fontFamily="sans-serif"
             android:lineSpacingExtra="4dp"
             android:text="@string/device_settings_subtitle"
-            android:textColor="@color/home_subtitle_orange"
+            android:textColor="@color/warm_text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
