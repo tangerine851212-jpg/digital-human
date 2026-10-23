@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.DUIX.Test" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/warm_bg</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="colorPrimary">@color/warm_bg</item>
+        <item name="colorPrimaryDark">@color/warm_accent</item>
+        <item name="colorAccent">@color/warm_accent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+
+    <!-- CallActivity 全屏沉浸主题 -->
+    <style name="Theme.DUIX.Call" parent="Theme.DUIX.Test">
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+</resources>

@@ -1,0 +1,73 @@
+plugins {
+    id 'com.android.library'
+}
+def sdkVersionCode = (rootProject.ext.has('versionCode') ? rootProject.ext.versionCode : 1) as Integer
+def sdkVersionName = (rootProject.ext.has('versionName') ? rootProject.ext.versionName : '1.0.0').toString()
+
+android {
+    namespace 'ai.guiji.duix.sdk.client'
+    compileSdk 33
+    ndkVersion '25.1.8937393'
+
+    defaultConfig {
+        minSdk 24
+
+        externalNativeBuild {
+            cmake {
+                if (project.hasProperty('includeX86_64')) {
+                    abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
+                } else {
+                    abiFilters 'arm64-v8a', 'armeabi-v7a'
+                }
+                cppFlags "-std=c++17", "-fexceptions"
+                //arguments "-DANDROID_STL=c++_shared","-DANDROID_TOOLCHAIN=clang"
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            buildConfigField("String", "VERSION_NAME", "\"${sdkVersionName}\"")
+            buildConfigField('int', 'VERSION_CODE', "${sdkVersionCode}")
+        }
+
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            buildConfigField("String", "VERSION_NAME", "\"${sdkVersionName}\"")
+            buildConfigField('int', 'VERSION_CODE', "${sdkVersionCode}")
+
+            android.libraryVariants.all { variant ->
+                variant.outputs.all {
+                    outputFileName = "duix_client_sdk_${buildType.name}_${sdkVersionName}.aar"
+                }
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.18.1"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+//    kotlinOptions {
+//        jvmTarget = '1.8'
+//    }
+//    packagingOptions {
+//        exclude 'lib/**/libonnxruntime.so'
+//    }
+}
+
+dependencies {
+    api fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
+}

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="primary">#5a7bbe</color>
+    <color name="primary_99">#995a7bbe</color>
+
+    <!-- 温暖主题色 -->
+    <color name="warm_bg">#FFF5F0EB</color>
+    <color name="warm_text_primary">#FF3E2723</color>
+    <color name="warm_text_secondary">#FF8D6E63</color>
+    <color name="warm_text_hint">#FFBCAAA4</color>
+    <color name="warm_accent">#FFE8926F</color>
+    <color name="warm_surface">#FFFFFBF7</color>
+    <color name="warm_surface_alt">#FFF0E2D4</color>
+    <color name="warm_button_primary">#FFC16845</color>
+    <color name="warm_button_primary_pressed">#FFAF583A</color>
+    <color name="warm_button_primary_disabled">#FFD9B9A8</color>
+    <color name="warm_button_secondary_bg">#FFF8EEE5</color>
+    <color name="warm_button_secondary_bg_pressed">#FFF0E0D2</color>
+    <color name="warm_button_secondary_bg_disabled">#FFF8F1EB</color>
+    <color name="warm_button_secondary_stroke">#FFD7B39B</color>
+    <color name="warm_status_pending">#FF9C7C6E</color>
+    <color name="warm_status_running">#FFC16845</color>
+    <color name="warm_status_success">#FF5C8C5A</color>
+    <color name="warm_status_error">#FFB85C4A</color>
+    <color name="warm_status_skipped">#FF7B8A94</color>
+</resources>
