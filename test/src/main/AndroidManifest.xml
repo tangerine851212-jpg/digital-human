@@ -30,6 +30,12 @@
         </activity>
 
         <activity
+            android:name=".ui.activity.OnboardingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.DUIX.Test">
+        </activity>
+
+        <activity
             android:name=".ui.activity.VoiceCloneSetupActivity"
             android:exported="false"
             android:theme="@style/Theme.DUIX.Test">

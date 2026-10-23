@@ -5,6 +5,7 @@ import ai.guiji.duix.test.R
 import ai.guiji.duix.test.databinding.ActivityMainBinding
 import ai.guiji.duix.test.model.AvatarCatalog
 import ai.guiji.duix.test.model.AvatarModel
+import ai.guiji.duix.test.service.AudiencePreferenceStore
 import ai.guiji.duix.test.service.DebugSettingsStore
 import ai.guiji.duix.test.service.FamilyBridgeService
 import ai.guiji.duix.test.ui.adapter.AvatarAdapter
@@ -20,6 +21,7 @@ import java.io.File
 class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val audiencePreferenceStore by lazy { AudiencePreferenceStore(applicationContext) }
     private val debugSettingsStore by lazy { DebugSettingsStore(applicationContext) }
     private val familyBridgeService by lazy { FamilyBridgeService(applicationContext) }
     private var mLoadingDialog: LoadingDialog? = null
@@ -31,6 +33,11 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (audiencePreferenceStore.getSegment() == null) {
+            startActivity(Intent(this, OnboardingActivity::class.java))
+            finish()
+            return
+        }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

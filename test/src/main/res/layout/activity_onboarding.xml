@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_home_gradient"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="18dp"
+        android:paddingTop="28dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="28dp">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/shape_warm_icon_button"
+            android:contentDescription="返回"
+            android:padding="9dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_arrow_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="sans-serif"
+            android:includeFontPadding="false"
+            android:letterSpacing="0.01"
+            android:text="安智伴"
+            android:textColor="@color/home_title_orange"
+            android:textSize="44sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:fontFamily="sans-serif"
+            android:text="先选择适合你的陪伴方式"
+            android:textColor="@color/warm_text_primary"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:lineSpacingExtra="3dp"
+            android:text="数字人形象和音色不变，只调整对话的称呼、语气和知识重点。之后可以在「我的」里随时切换。"
+            android:textColor="@color/warm_text_secondary"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:id="@+id/optionTeen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:background="@drawable/selector_onboarding_card"
+            android:clickable="true"
+            android:contentDescription="选择青少年模式"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="18dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="青少年"
+                    android:textColor="@color/warm_text_primary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="13–17岁 · 学习、同伴与家庭沟通"
+                    android:textColor="@color/warm_text_secondary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:lineSpacingExtra="4dp"
+                    android:text="像同龄朋友一样交流，先听你说，再一起想办法。"
+                    android:textColor="@color/warm_text_primary"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/checkTeen"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:background="@drawable/shape_onboarding_check"
+                android:gravity="center"
+                android:importantForAccessibility="no"
+                android:text="✓"
+                android:textColor="@color/warm_surface"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:visibility="invisible" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/optionAdult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/selector_onboarding_card"
+            android:clickable="true"
+            android:contentDescription="选择壮年模式"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="18dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="壮年"
+                    android:textColor="@color/warm_text_primary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="18–59岁 · 工作、关系、睡眠与压力"
+                    android:textColor="@color/warm_text_secondary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:lineSpacingExtra="4dp"
+                    android:text="务实梳理，把压力拆成能完成的小步骤。"
+                    android:textColor="@color/warm_text_primary"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/checkAdult"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:background="@drawable/shape_onboarding_check"
+                android:gravity="center"
+                android:importantForAccessibility="no"
+                android:text="✓"
+                android:textColor="@color/warm_surface"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:visibility="invisible" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/optionSenior"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/selector_onboarding_card"
+            android:clickable="true"
+            android:contentDescription="选择老年模式"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="18dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="老年"
+                    android:textColor="@color/warm_text_primary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="60岁以上 · 孤独、健康担忧与家庭支持"
+                    android:textColor="@color/warm_text_secondary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:lineSpacingExtra="4dp"
+                    android:text="更慢、更清楚的表达，尊重您的节奏。"
+                    android:textColor="@color/warm_text_primary"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/checkSenior"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:background="@drawable/shape_onboarding_check"
+                android:gravity="center"
+                android:importantForAccessibility="no"
+                android:text="✓"
+                android:textColor="@color/warm_surface"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:visibility="invisible" />
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnContinue"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="22dp"
+            android:background="@drawable/selector_warm_primary_button"
+            android:elevation="0dp"
+            android:enabled="false"
+            android:stateListAnimator="@null"
+            android:text="开始陪伴"
+            android:textAllCaps="false"
+            android:textColor="@color/text_warm_primary_button"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/shape_warm_feature_card"
+            android:lineSpacingExtra="4dp"
+            android:padding="14dp"
+            android:text="安智伴提供心理陪伴与自助支持，不能替代医生或心理咨询师。紧急情况请联系 120/110 或 12356。"
+            android:textColor="@color/warm_text_secondary"
+            android:textSize="12.5sp" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
