@@ -30,14 +30,14 @@ class AvatarAdapter(
         holder.binding.ivAvatar.setImageResource(model.avatarRes)
         holder.binding.tvName.text = model.name
         val selected = enableSelection && model.modelUrl == selectedModelUrl
-        holder.binding.cardAvatar.strokeWidth = if (selected) 3 else 0
-        holder.binding.cardAvatar.cardElevation = if (selected) 8f else 3f
-        holder.binding.cardAvatar.alpha = if (selected) 1f else 0.96f
+        holder.binding.cardAvatar.strokeWidth = if (selected) 2 else 1
+        holder.binding.cardAvatar.cardElevation = 0f
+        holder.binding.cardAvatar.alpha = 1f
         holder.binding.cardAvatar.setStrokeColor(
             if (selected) {
-                ContextCompat.getColor(holder.binding.root.context, ai.guiji.duix.test.R.color.warm_accent)
+                ContextCompat.getColor(holder.binding.root.context, ai.guiji.duix.test.R.color.warm_button_primary)
             } else {
-                ContextCompat.getColor(holder.binding.root.context, android.R.color.transparent)
+                ContextCompat.getColor(holder.binding.root.context, ai.guiji.duix.test.R.color.warm_line)
             }
         )
         holder.binding.cardAvatar.setOnClickListener {

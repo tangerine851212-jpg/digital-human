@@ -8,8 +8,8 @@
         <item name="android:windowIsTranslucent">false</item>
         <item name="android:windowIsFloating">false</item>
         <item name="colorPrimary">@color/warm_bg</item>
-        <item name="colorPrimaryDark">@color/warm_accent</item>
-        <item name="colorAccent">@color/warm_accent</item>
+        <item name="colorPrimaryDark">@color/warm_button_primary</item>
+        <item name="colorAccent">@color/warm_button_primary</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentStatus">false</item>

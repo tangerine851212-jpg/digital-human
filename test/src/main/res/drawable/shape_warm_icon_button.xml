@@ -3,5 +3,5 @@
     <solid android:color="@color/warm_surface" />
     <stroke
         android:width="1dp"
-        android:color="#FFE3C7B3" />
+        android:color="@color/warm_line" />
 </shape>

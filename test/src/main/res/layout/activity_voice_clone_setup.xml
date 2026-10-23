@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:text="@string/voice_clone_title"
         android:textColor="@color/warm_text_primary"
-        android:textSize="25sp"
+        android:textSize="28sp"
         android:textStyle="bold" />
 
     <TextView
@@ -29,18 +29,18 @@
         android:layout_marginTop="8dp"
         android:text="@string/voice_clone_subtitle"
         android:textColor="@color/warm_text_secondary"
-        android:textSize="15sp" />
+        android:textSize="17sp" />
 
     <TextView
         android:id="@+id/tvStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/shape_warm_feature_card"
-        android:lineSpacingExtra="4dp"
-        android:padding="18dp"
+        android:lineSpacingExtra="5dp"
+        android:padding="20dp"
         android:textColor="@color/warm_text_primary"
-        android:textSize="18sp" />
+        android:textSize="19sp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -48,7 +48,7 @@
             android:layout_marginTop="20dp"
             android:text="@string/voice_clone_choose_avatar"
             android:textColor="@color/warm_text_primary"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -66,7 +66,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/voice_clone_record_title"
         android:textColor="@color/warm_text_primary"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textStyle="bold" />
 
     <TextView
@@ -75,7 +75,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:textColor="@color/warm_text_secondary"
-        android:textSize="15sp" />
+        android:textSize="17sp" />
 
     <TextView
         android:id="@+id/tvRecordTime"
@@ -84,7 +84,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="12dp"
         android:textColor="@color/warm_button_primary"
-        android:textSize="24sp"
+        android:textSize="40sp"
         android:textStyle="bold" />
 
     <TextView
@@ -93,10 +93,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
         android:background="@drawable/shape_warm_feature_card"
-        android:lineSpacingExtra="5dp"
-        android:padding="18dp"
+        android:lineSpacingExtra="6dp"
+        android:padding="20dp"
         android:textColor="@color/warm_text_primary"
-        android:textSize="16sp" />
+        android:textSize="18sp" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnPrimaryAction"
@@ -108,7 +108,7 @@
             android:stateListAnimator="@null"
             android:textAllCaps="false"
             android:textColor="@color/text_warm_primary_button"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -121,7 +121,7 @@
             android:stateListAnimator="@null"
             android:textAllCaps="false"
             android:textColor="@color/text_warm_secondary_button"
-            android:textSize="17sp" />
+            android:textSize="18sp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
