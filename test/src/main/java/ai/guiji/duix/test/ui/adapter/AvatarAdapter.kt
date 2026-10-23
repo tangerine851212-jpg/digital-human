@@ -37,7 +37,7 @@ class AvatarAdapter(
             if (selected) {
                 ContextCompat.getColor(holder.binding.root.context, ai.guiji.duix.test.R.color.warm_button_primary)
             } else {
-                ContextCompat.getColor(holder.binding.root.context, ai.guiji.duix.test.R.color.warm_line)
+                ContextCompat.getColor(holder.binding.root.context, ai.guiji.duix.test.R.color.card_stroke)
             }
         )
         holder.binding.cardAvatar.setOnClickListener {

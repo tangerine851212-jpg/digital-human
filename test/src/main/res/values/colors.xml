@@ -34,4 +34,6 @@
     <color name="warm_status_skipped">#FF6F665C</color>
     <color name="home_title_orange">#FFE86A1C</color>
     <color name="home_subtitle_orange">#FFC25A1B</color>
+    <color name="card_surface">#FFFFFBF6</color>
+    <color name="card_stroke">#33B9542E</color>
 </resources>
