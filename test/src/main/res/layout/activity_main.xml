@@ -9,8 +9,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="32dp"
         android:paddingBottom="24dp">
+
+        <LinearLayout
+            android:id="@+id/homeHero"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_home_gradient"
+            android:orientation="vertical"
+            android:paddingTop="32dp"
+            android:paddingBottom="18dp">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -22,15 +30,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingEnd="68dp">
+                android:paddingEnd="175dp">
 
                 <TextView
                     android:id="@+id/tv_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:includeFontPadding="false"
+                    android:letterSpacing="0.01"
                     android:text="@string/app_title"
-                    android:textColor="@color/warm_text_primary"
-                    android:textSize="28sp"
+                    android:textColor="@color/home_title_orange"
+                    android:textSize="46sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -38,22 +49,36 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:lineSpacingExtra="6dp"
+                    android:fontFamily="sans-serif"
+                    android:lineSpacingExtra="4dp"
                     android:text="@string/app_subtitle"
-                    android:textColor="@color/warm_text_secondary"
-                    android:textSize="17sp" />
+                    android:textColor="@color/home_subtitle_orange"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivHomeIllustration"
+                android:layout_width="165dp"
+                android:layout_height="143dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="44dp"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
+                android:scaleType="fitEnd"
+                android:src="@drawable/azb_home_illustration" />
 
             <ImageButton
                 android:id="@+id/btnSettings"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="top|end"
                 android:background="@drawable/shape_warm_icon_button"
                 android:contentDescription="@string/settings_open"
-                android:padding="10dp"
+                android:padding="9dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/ic_settings" />
+                android:src="@drawable/ic_settings"
+                android:tint="@color/home_title_orange" />
         </FrameLayout>
 
         <LinearLayout
@@ -97,6 +122,8 @@
                 android:textColor="@color/text_warm_primary_button"
                 android:textSize="19sp"
                 android:textStyle="bold" />
+
+        </LinearLayout>
 
         </LinearLayout>
 

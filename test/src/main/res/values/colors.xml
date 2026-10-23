@@ -32,4 +32,6 @@
     <color name="warm_status_success">#FF2F7A4B</color>
     <color name="warm_status_error">#FFA8452F</color>
     <color name="warm_status_skipped">#FF6F665C</color>
+    <color name="home_title_orange">#FFE86A1C</color>
+    <color name="home_subtitle_orange">#FFC25A1B</color>
 </resources>
