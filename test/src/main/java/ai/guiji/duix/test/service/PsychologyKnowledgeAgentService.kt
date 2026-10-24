@@ -21,22 +21,29 @@ class PsychologyKnowledgeAgentService(
         .callTimeout(180, TimeUnit.SECONDS)
         .build()
 
-    private val knowledgeText: String by lazy {
-        appContext.assets.open(DashScopeConfig.PSYCHOLOGY_KNOWLEDGE_ASSET_PATH)
-            .bufferedReader(Charsets.UTF_8)
-            .use { reader ->
-                reader.readText()
-                    .replace('\u000c', '\n')
-                    .replace("\u0000", "")
-            }
+    private val knowledgeTextCache = mutableMapOf<String, String>()
+
+    private fun loadKnowledgeText(assetPath: String): String = synchronized(knowledgeTextCache) {
+        knowledgeTextCache.getOrPut(assetPath) {
+            appContext.assets.open(assetPath)
+                .bufferedReader(Charsets.UTF_8)
+                .use { reader ->
+                    reader.readText()
+                        .replace('\u000c', '\n')
+                        .replace("\u0000", "")
+                }
+        }
     }
 
     fun consultKnowledge(
         question: String,
         focus: String? = null,
+        knowledgeAsset: String = DashScopeConfig.PSYCHOLOGY_KNOWLEDGE_ASSET_PATH,
+        audienceName: String = "老年",
     ): KnowledgeAnswer {
         val normalizedQuestion = question.trim()
         require(normalizedQuestion.isNotEmpty()) { "问题不能为空" }
+        val knowledgeText = loadKnowledgeText(knowledgeAsset)
 
         val request = Request.Builder()
             .url(DashScopeConfig.MULTIMODAL_GENERATION_URL)
@@ -46,6 +53,8 @@ class PsychologyKnowledgeAgentService(
                 buildRequestPayload(
                     normalizedQuestion,
                     focus?.trim().takeIf { !it.isNullOrEmpty() },
+                    knowledgeText,
+                    audienceName,
                 ).toString().toRequestBody(JSON_MEDIA_TYPE)
             )
             .build()
@@ -80,6 +89,8 @@ class PsychologyKnowledgeAgentService(
     private fun buildRequestPayload(
         question: String,
         focus: String?,
+        knowledgeText: String,
+        audienceName: String,
     ): JSONObject {
         return JSONObject().apply {
             put("model", DashScopeConfig.PSYCHOLOGY_SUBAGENT_MODEL)
@@ -92,7 +103,7 @@ class PsychologyKnowledgeAgentService(
                             .put(
                                 JSONObject().apply {
                                     put("role", "system")
-                                    put("content", buildSystemPrompt())
+                                    put("content", buildSystemPrompt(knowledgeText, audienceName))
                                 }
                             )
                             .put(
@@ -116,12 +127,12 @@ class PsychologyKnowledgeAgentService(
         }
     }
 
-    private fun buildSystemPrompt(): String {
+    private fun buildSystemPrompt(knowledgeText: String, audienceName: String): String {
         return buildString {
             append(knowledgeText)
-            append("以上是完整知识库全文\n")
-            append("你是一个面向老年陪伴场景的权威照护知识子代理。")
-            append("你只能依据系统里提供的 WHO ICOPE 2024 全文回答，不要编造，不要输出与原文冲突的结论。")
+            append("\n以上是本次可依据的完整知识库全文。\n")
+            append("你是一个面向${audienceName}心理陪伴场景的权威心理知识子代理。")
+            append("你只能依据系统里提供的知识库全文回答，不要编造，不要输出与原文冲突的结论。")
             append("如果知识库未提供足够直接依据，要明确说明。")
             append("请使用简体中文输出，提供权威心理学指示和说明。不需要包括生活化语言，你只是一个查询专家，不负责指导。直接输出无格式纯文本，答案简练不超过100字。")
         }
@@ -132,7 +143,7 @@ class PsychologyKnowledgeAgentService(
         focus: String?,
     ): String {
         return buildString {
-            append("请基于上面的 WHO ICOPE 2024 全文，回答下面这个需要查询的问题。\n")
+            append("请基于上面的知识库全文，回答下面这个需要查询的问题。\n")
             append("核心问题：")
             append(question)
             if (!focus.isNullOrBlank()) {

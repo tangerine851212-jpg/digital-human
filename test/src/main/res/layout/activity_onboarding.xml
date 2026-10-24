@@ -41,19 +41,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:fontFamily="sans-serif"
+            android:lineSpacingExtra="4dp"
             android:text="先选择适合你的陪伴方式"
-            android:textColor="@color/warm_text_primary"
+            android:textColor="@color/home_subtitle_orange"
             android:textSize="22sp"
             android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:lineSpacingExtra="3dp"
-            android:text="数字人形象和音色不变，只调整对话的称呼、语气和知识重点。之后可以在「我的」里随时切换。"
-            android:textColor="@color/warm_text_secondary"
-            android:textSize="14sp" />
 
         <LinearLayout
             android:id="@+id/optionTeen"

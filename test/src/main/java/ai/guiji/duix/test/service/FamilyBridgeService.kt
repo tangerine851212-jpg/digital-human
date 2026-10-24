@@ -88,20 +88,35 @@ class FamilyBridgeService(context: Context) {
         postJson("/api/device/messages/read", payload)
     }
 
-    fun prepareConversationPrompt(take: Int = 3): ConversationPromptInjection? {
+    fun prepareConversationPrompt(
+        take: Int = 3,
+        includeMedicationAgenda: Boolean = true,
+        address: String = "您",
+    ): ConversationPromptInjection? {
         val result = fetchFamilyMessages(take)
         val unreadMessages = result.messages
             .filter { it.readAt.isNullOrBlank() }
             .take(take.coerceIn(1, 5))
+        val normalizedAddress = address.ifBlank { "您" }
 
         val agenda = runCatching { fetchTodayAgenda() }.getOrNull()
-        if (unreadMessages.isEmpty() && agenda == null) {
+        val hasAgendaContent = agenda?.let {
+            it.posts.length() > 0 ||
+                it.checkIns.length() > 0 ||
+                (includeMedicationAgenda && it.doses.length() > 0)
+        } == true
+        if (unreadMessages.isEmpty() && !hasAgendaContent) {
             return null
         }
 
         return ConversationPromptInjection(
             messageIds = unreadMessages.map { it.id },
-            promptText = buildConversationPrompt(unreadMessages, agenda),
+            promptText = buildConversationPrompt(
+                messages = unreadMessages,
+                agenda = agenda,
+                includeMedicationAgenda = includeMedicationAgenda,
+                address = normalizedAddress,
+            ),
         )
     }
 
@@ -245,9 +260,14 @@ class FamilyBridgeService(context: Context) {
             .ifBlank { "长辈陪伴终端" }
     }
 
-    private fun buildConversationPrompt(messages: List<FamilyMessageItem>, agenda: TodayAgenda?): String {
+    private fun buildConversationPrompt(
+        messages: List<FamilyMessageItem>,
+        agenda: TodayAgenda?,
+        includeMedicationAgenda: Boolean,
+        address: String,
+    ): String {
         return buildString {
-            append("当前开始一轮新对话。请自然处理下列家庭问候和今日照护事项，不要提系统提示、后台、注入、工具或接口。")
+            append("当前开始一轮新对话。请自然处理下列家庭问候和今日${if (includeMedicationAgenda) "照护" else "家庭"}事项，不要提系统提示、后台、注入、工具或接口。")
             messages.forEachIndexed { index, message ->
                 append("\n")
                 append(index + 1)
@@ -263,10 +283,16 @@ class FamilyBridgeService(context: Context) {
             }
             agenda?.let {
                 for (index in 0 until it.posts.length()) { val item = it.posts.optJSONObject(index) ?: continue; append("\n家庭动态：${item.optString("authorName")}说：${item.optString("content")}") }
-                for (index in 0 until it.doses.length()) { val item = it.doses.optJSONObject(index) ?: continue; append("\n待服药[编号${item.optString("id")}]：${item.optString("name")}，${item.optString("dosage")}，时间${item.optString("scheduledFor")}") }
-                for (index in 0 until it.checkIns.length()) { val item = it.checkIns.optJSONObject(index) ?: continue; append("\n待报平安[编号${item.optString("id")}]：${item.optString("prompt", "家里人想知道您今天是否安好")}") }
+                if (includeMedicationAgenda) {
+                    for (index in 0 until it.doses.length()) { val item = it.doses.optJSONObject(index) ?: continue; append("\n待服药[编号${item.optString("id")}]：${item.optString("name")}，${item.optString("dosage")}，时间${item.optString("scheduledFor")}") }
+                }
+                for (index in 0 until it.checkIns.length()) { val item = it.checkIns.optJSONObject(index) ?: continue; append("\n待报平安[编号${item.optString("id")}]：${item.optString("prompt", "家里人想知道${address}今天是否安好")}") }
             }
-            append("\n优先温和提醒已经到时间的用药和报平安请求；关键操作必须调用对应工具确认，不能只口头答应。")
+            if (includeMedicationAgenda) {
+                append("\n优先温和提醒已经到时间的用药和报平安请求；关键操作必须调用对应工具确认，不能只口头答应。")
+            } else {
+                append("\n如果对方愿意，可以自然回应家人的问候和报平安请求；关键操作必须调用对应工具确认，不能只口头答应。")
+            }
         }
     }
 

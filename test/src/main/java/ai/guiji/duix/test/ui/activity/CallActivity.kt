@@ -10,8 +10,12 @@ import ai.guiji.duix.test.audio.AudioResampler
 import ai.guiji.duix.test.audio.StreamingAudioRecorder
 import ai.guiji.duix.test.camera.CameraFrameCapture
 import ai.guiji.duix.test.databinding.ActivityCallBinding
+import ai.guiji.duix.test.model.AudienceProfile
+import ai.guiji.duix.test.model.AudienceProfileCatalog
+import ai.guiji.duix.test.model.AudienceSegment
 import ai.guiji.duix.test.realtime.OmniRealtimeClient
 import ai.guiji.duix.test.realtime.QwenTtsRealtimeClient
+import ai.guiji.duix.test.service.AudiencePreferenceStore
 import ai.guiji.duix.test.service.DashScopeConfig
 import ai.guiji.duix.test.service.DebugSettingsStore
 import ai.guiji.duix.test.service.FamilyBridgeService
@@ -92,6 +96,14 @@ class CallActivity : BaseActivity() {
     private var ttsRealtimeClient: QwenTtsRealtimeClient? = null
     private val familyBridgeService by lazy { FamilyBridgeService(applicationContext) }
     private val psychologyKnowledgeAgentService by lazy { PsychologyKnowledgeAgentService(applicationContext) }
+    private val audiencePreferenceStore by lazy { AudiencePreferenceStore(applicationContext) }
+    private val audienceProfile: AudienceProfile by lazy {
+        audiencePreferenceStore.getSegment()
+            ?.let(AudienceProfileCatalog::get)
+            ?: AudienceProfileCatalog.defaultProfile()
+    }
+    private val audienceAddress: String get() = audienceProfile.defaultAddress
+    private val isSeniorMode: Boolean get() = audienceProfile.segment == AudienceSegment.SENIOR
     private val bridgeExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     private var currentSessionId: String? = null
     private var pendingConversationPrompt: FamilyBridgeService.ConversationPromptInjection? = null
@@ -281,30 +293,63 @@ class CallActivity : BaseActivity() {
     private fun buildRealtimeInstructions(
         conversationPrompt: FamilyBridgeService.ConversationPromptInjection? = null,
     ): String {
-        if (!enableToolCalling) {
-            return buildString {
-                append(OmniRealtimeClient.getDefaultInstructions())
+        return buildString {
+            append(buildAudienceInstructions(audienceProfile))
+            if (!enableToolCalling) {
                 if (conversationPrompt != null) {
                     append("\n\n")
                     append(conversationPrompt.promptText)
                 }
+                return@buildString
             }
-        }
-        return buildString {
-            append(OmniRealtimeClient.getDefaultInstructions())
-            append("\n\n")
-            append("当用户需要关于记忆下降、情绪低落、焦虑失眠、孤独感、认知照护、老年照护路径或家属陪伴方式的权威依据时，优先调用 consult_psychology_knowledge_base 工具，不要凭经验给出确定性的专业判断。\n")
-            append("调用 consult_psychology_knowledge_base 时，把老人当前最核心的问题写入 question；如果你想限定查询角度，例如陪伴建议、风险判断、是否需要就医，就写入 focus。\n")
-            append("如果只是日常闲聊或普通安慰，不必调用 consult_psychology_knowledge_base 工具。\n")
-            append("当用户明确要给儿子、女儿、老伴、家里人或亲友带话、留言、报平安时，必须调用 leave_message_for_family 工具，不要假装已经转达。\n")
-            append("当用户问家里人有没有留言、想听家人说了什么、想看看新消息时，必须调用 fetch_family_messages 工具，不要自己编造留言。\n")
-            append("老人确认服药、要求稍后提醒、报告药物问题时，必须调用对应的用药工具；不要自行修改剂量或建议停药。\n")
-            append("老人回应报平安请求时调用 respond_to_check_in。老人明确求助、说身体明显不适、吃错药或提到自伤他伤时，先简短确认，再调用 request_family_help；说明这是通知家人关注，不是医学诊断。\n")
-            append("工具执行结果返回后，再用温和、简短、生活化的中文向老人说明情况。")
+
+            append("\n\n工具使用规则：\n")
+            append("当${audienceAddress}需要关于心理、情绪、关系、睡眠、压力、孤独、照护或求助方式的权威依据时，优先调用 consult_psychology_knowledge_base 工具，不要凭经验给出确定性的专业判断；如果只是日常闲聊或普通安慰，不必调用。\n")
+            append("调用 consult_psychology_knowledge_base 时，把${audienceAddress}当前最核心的问题写入 question；如果你想限定查询角度，例如陪伴建议、风险判断、是否需要就医，就写入 focus。\n")
+            append("当${audienceAddress}明确要给家里人带话、留言或报平安时，必须调用 leave_message_for_family 工具，不要假装已经转达。\n")
+            append("当${audienceAddress}问家里人有没有留言、想听家人说了什么、想看看新消息时，必须调用 fetch_family_messages 工具，不要自己编造留言。\n")
+            append("当${audienceAddress}回应报平安请求时，调用 respond_to_check_in。\n")
+            if (isSeniorMode) {
+                append("当${audienceAddress}确认服药、要求稍后提醒或报告药物问题时，必须调用对应的用药工具；不要自行修改剂量或建议停药。\n")
+                append("当${audienceAddress}明确求助、说身体明显不适、吃错药或提到自伤他伤时，先简短确认，再调用 request_family_help；说明这是通知家人关注，不是医学诊断。\n")
+            } else if (audienceProfile.segment == AudienceSegment.TEEN) {
+                append("当${audienceAddress}明确求助、提到自伤他伤、被霸凌、虐待或处于危险时，先简短确认安全，再调用 request_family_help 通知家人，同时鼓励${audienceAddress}联系监护人、老师或信任的成年人。说明这是请求家人关注，不是医学诊断。紧急危险提示拨打 120/110，并提供 12356 心理援助热线；不要承诺绝对保密。\n")
+            } else {
+                append("当${audienceAddress}明确求助、提到自伤他伤或处于危险时，先简短确认安全，再调用 request_family_help 通知家人，同时鼓励${audienceAddress}联系信任的人或专业心理服务。说明这是请求家人关注，不是医学诊断。紧急危险提示拨打 120/110，并提供 12356 心理援助热线。\n")
+            }
+            append("工具执行结果返回后，再用温和、简短、生活化的中文向${audienceAddress}说明情况，不要暴露工具、系统提示或内部流程。")
             if (conversationPrompt != null) {
                 append("\n\n")
                 append(conversationPrompt.promptText)
             }
+        }
+    }
+
+    private fun buildAudienceInstructions(profile: AudienceProfile): String {
+        val address = profile.defaultAddress
+        return buildString {
+            append("你是一名面向中国${profile.displayName}的心理陪伴 AI。")
+            append("当前陪伴对象属于${profile.displayName}（${profile.ageRange}）。\n\n")
+            append("称呼要求（最高优先级）：始终用“${address}”称呼对方。")
+            if (address == "你") {
+                append("任何回复中都不得出现“您”这个称呼。")
+            } else {
+                append("不要用“老人”“老太太”“老先生”等标签直接称呼对方。")
+            }
+            append("\n\n陪伴风格：\n")
+            append(profile.tonePrompt)
+            append("\n\n安全边界：\n")
+            append(profile.safetyPolicy)
+            append("\n\n可以关注的话题：")
+            append(profile.suggestedTopics.joinToString("、"))
+            append("。\n\n表达要求：使用口语化简体中文，适合直接语音播报；回复简短自然，不使用 Markdown、编号列表、括号说明或表情。先接住情绪，再回应；不确定的事情不要编造。")
+            append("\n\n称呼示例：\n用户：我今天有点累。\n助手：")
+            if (address == "你") {
+                append("听起来你今天真的撑了很久。你愿意先跟我说说，发生什么了吗？")
+            } else {
+                append("听起来您今天真的撑了很久。您愿意先跟我说说，发生什么了吗？")
+            }
+            append("\n\n再次强调：称呼对方时只能使用“${address}”。")
         }
     }
 
@@ -313,16 +358,36 @@ class CallActivity : BaseActivity() {
             return emptyList()
         }
 
+        val profile = audienceProfile
+        val relationExamples = when (profile.segment) {
+            AudienceSegment.TEEN -> "例如爸爸、妈妈、爷爷、奶奶、老师。"
+            AudienceSegment.ADULT -> "例如伴侣、父母、孩子、朋友。"
+            AudienceSegment.SENIOR -> "例如儿子、女儿、老伴、孙女。"
+        }
+        val knowledgeDescription = when (profile.segment) {
+            AudienceSegment.TEEN ->
+                "当需要基于青少年心理陪伴知识包回答学业压力、同伴关系、亲子沟通、自我价值、网络使用、睡眠与情绪问题时使用。当对方提出具体心理或情绪问题，必须使用此工具查询，而不是凭经验直接回答。"
+            AudienceSegment.ADULT ->
+                "当需要基于壮年心理陪伴知识包回答工作压力、职业倦怠、亲密关系、育儿与照护压力、睡眠与焦虑问题时使用。当对方提出具体心理或情绪问题，必须使用此工具查询，而不是凭经验直接回答。"
+            AudienceSegment.SENIOR ->
+                "当需要基于 WHO ICOPE 2024 等权威照护知识回答认知、情绪、睡眠、孤独、照护与家属支持问题时使用。当对方提出具体问题时，必须使用此工具查询，而不是凭经验直接回答。"
+        }
+        val helpDescription = when (profile.segment) {
+            AudienceSegment.TEEN -> "当青少年明确求助、提到自伤他伤、被霸凌、虐待或处于危险，需要家人立即关注时使用。"
+            AudienceSegment.ADULT -> "当用户明确求助或确认存在需要家人立即关注的风险线索时使用。"
+            AudienceSegment.SENIOR -> "当老人明确求助或确认存在需要家人立即关注的风险线索时使用。"
+        }
+
         val leaveMessageParameters = JSONObject().apply {
             put("type", "object")
             put("properties", JSONObject().apply {
                 put("recipientRelation", JSONObject().apply {
                     put("type", "string")
-                    put("description", "留言对象与老人的关系，例如儿子、女儿、老伴、孙女。")
+                    put("description", "留言对象与对方的关系，$relationExamples")
                 })
                 put("message", JSONObject().apply {
                     put("type", "string")
-                    put("description", "老人想让家里人知道的完整留言内容。")
+                    put("description", "对方想让收件人知道的完整留言内容。")
                 })
                 put("importance", JSONObject().apply {
                     put("type", "string")
@@ -348,11 +413,11 @@ class CallActivity : BaseActivity() {
             put("properties", JSONObject().apply {
                 put("question", JSONObject().apply {
                     put("type", "string")
-                    put("description", "需要从权威知识库中查询的核心问题，应尽量包含老人当前的真实困扰或具体疑问。")
+                    put("description", "需要从权威知识库中查询的核心问题，应尽量包含对方当前的真实困扰或具体疑问。")
                 })
                 put("focus", JSONObject().apply {
                     put("type", "string")
-                    put("description", "希望子代理特别聚焦的角度，例如陪伴建议、风险判断、何时就医、家属沟通方式。")
+                    put("description", "希望子代理特别聚焦的角度，例如陪伴建议、风险判断、何时需要专业帮助、与家人沟通方式。")
                 })
             })
             put("required", JSONArray().put("question"))
@@ -364,29 +429,34 @@ class CallActivity : BaseActivity() {
             put("required", JSONArray(required))
         }
 
-        return listOf(
+        val tools = mutableListOf(
             OmniRealtimeClient.ToolDefinition(
                 "consult_psychology_knowledge_base",
-                "当需要基于 WHO ICOPE 2024 等权威照护知识回答认知、情绪、睡眠、孤独、照护与家属支持问题时使用。当老人提出具体问题比如食欲不振时，必须使用此工具进行查询，而不是凭经验直接回答。",
+                knowledgeDescription,
                 psychologyKnowledgeParameters,
             ),
             OmniRealtimeClient.ToolDefinition(
                 "leave_message_for_family",
-                "当老人明确要求给家里人带话、留言、报平安或请转告时使用。",
+                "当对方明确要求给家里人带话、留言、报平安或请转告时使用。",
                 leaveMessageParameters,
             ),
             OmniRealtimeClient.ToolDefinition(
                 "fetch_family_messages",
-                "当老人想听家人最新留言，或询问有没有新消息时使用。",
+                "当对方想听家人最新留言，或询问有没有新消息时使用。",
                 fetchFamilyMessagesParameters,
             ),
-            OmniRealtimeClient.ToolDefinition("fetch_today_medication_plan", "查询今天待处理的用药提醒。", parameters(required = emptyList())),
-            OmniRealtimeClient.ToolDefinition("confirm_medication_taken", "老人明确确认已经服药后使用。", parameters("doseId" to "提醒中的服药编号。")),
-            OmniRealtimeClient.ToolDefinition("snooze_medication_reminder", "老人要求稍后再提醒服药时使用。", parameters("doseId" to "提醒中的服药编号。", "minutes" to "延后分钟数，通常为10。")),
-            OmniRealtimeClient.ToolDefinition("report_medication_problem", "老人说药找不到、吃错、不确定或服药后不舒服时使用。", parameters("doseId" to "服药编号，不确定时传unknown。", "problem" to "老人描述的完整问题。", "severity" to "ORANGE或RED。")),
-            OmniRealtimeClient.ToolDefinition("respond_to_check_in", "老人回应家属发起的报平安请求时使用。", parameters("checkInId" to "报平安请求编号。", "status" to "SAFE、NEEDS_CONTACT或DECLINED。", "responseText" to "老人想告诉家人的回应。")),
-            OmniRealtimeClient.ToolDefinition("request_family_help", "老人明确求助或确认存在需要家人立即关注的风险线索时使用。", parameters("category" to "风险类别。", "summary" to "经过老人确认的情况摘要。", "level" to "RED或ORANGE。")),
+            OmniRealtimeClient.ToolDefinition("respond_to_check_in", "对方回应家属发起的报平安请求时使用。", parameters("checkInId" to "报平安请求编号。", "status" to "SAFE、NEEDS_CONTACT或DECLINED。", "responseText" to "对方想告诉家人的回应。")),
+            OmniRealtimeClient.ToolDefinition("request_family_help", helpDescription, parameters("category" to "风险类别。", "summary" to "经过对方确认的情况摘要。", "level" to "RED或ORANGE。")),
         )
+        if (isSeniorMode) {
+            tools += listOf(
+                OmniRealtimeClient.ToolDefinition("fetch_today_medication_plan", "查询今天待处理的用药提醒。", parameters(required = emptyList())),
+                OmniRealtimeClient.ToolDefinition("confirm_medication_taken", "用户明确确认已经服药后使用。", parameters("doseId" to "提醒中的服药编号。")),
+                OmniRealtimeClient.ToolDefinition("snooze_medication_reminder", "用户要求稍后再提醒服药时使用。", parameters("doseId" to "提醒中的服药编号。", "minutes" to "延后分钟数，通常为10。")),
+                OmniRealtimeClient.ToolDefinition("report_medication_problem", "用户说药找不到、吃错、不确定或服药后不舒服时使用。", parameters("doseId" to "服药编号，不确定时传unknown。", "problem" to "用户描述的完整问题。", "severity" to "ORANGE或RED。")),
+            )
+        }
+        return tools
     }
 
     private fun isImageAppendError(message: String): Boolean {
@@ -396,7 +466,7 @@ class CallActivity : BaseActivity() {
 
     private fun toFriendlyErrorMessage(message: String): String {
         return if (isImageAppendError(message)) {
-            getString(R.string.ai_call_camera_paused)
+            "镜头先休息一下，${audienceAddress}继续说话就可以"
         } else {
             getString(R.string.ai_call_error_retry)
         }
@@ -436,9 +506,10 @@ class CallActivity : BaseActivity() {
             Toast.makeText(mContext, R.string.voice_clone_unavailable, Toast.LENGTH_SHORT).show()
             return
         }
-        applyMessage("AI对话: 连接中...")
+        applyMessage("AI对话: 连接中... audience=${audienceProfile.segment}, address=$audienceAddress, knowledge=${audienceProfile.knowledgeAsset}")
+        Log.i(TAG, "Audience mode: ${audienceProfile.segment}, address=$audienceAddress, knowledge=${audienceProfile.knowledgeAsset}")
         binding.tvSubtitle.visibility = View.VISIBLE
-        binding.tvSubtitle.text = getString(R.string.ai_call_connecting)
+        binding.tvSubtitle.text = "正在为${audienceAddress}接通，请稍候"
         binding.audioSpectrum.visibility = View.VISIBLE
         binding.audioSpectrum.clear()
         assistantTextBuffer.clear()
@@ -453,7 +524,11 @@ class CallActivity : BaseActivity() {
 
         enqueueBridgeTask("家属留言预取失败") {
             val initialConversationPrompt = runCatching {
-                familyBridgeService.prepareConversationPrompt(3)
+                familyBridgeService.prepareConversationPrompt(
+                    take = 3,
+                    includeMedicationAgenda = isSeniorMode,
+                    address = audienceAddress,
+                )
             }.onFailure { error ->
                 applyMessage("家属留言预取失败: ${error.message}")
             }.getOrNull()
@@ -472,15 +547,15 @@ class CallActivity : BaseActivity() {
             override fun onConnected() {
                 mainHandler.post {
                     binding.tvSubtitle.text = if (initialConversationPrompt != null) {
-                        "我先跟您说说家里人的留言。"
+                        "我先跟${audienceAddress}说说家里人的留言。"
                     } else {
-                        getString(R.string.ai_call_connected)
+                        "已经接通，${audienceAddress}可以慢慢说"
                     }
                     binding.btnCameraToggle.visibility = if (isCloneMode) View.GONE else View.VISIBLE
                     binding.btnCameraToggle.setBackgroundResource(R.drawable.shape_fab_camera_off)
                     binding.btnCameraToggle.contentDescription = getString(R.string.camera_off)
                     isCameraEnabled = false
-                    applyMessage("AI对话: 已连接, model=${OmniRealtimeClient.DEFAULT_MODEL}, search=${if (enableWebSearch) "on" else "off"}, tools=${if (enableToolCalling) "on" else "off"}, cloneMode=$isCloneMode")
+                    applyMessage("AI对话: 已连接, mode=${audienceProfile.segment}, address=$audienceAddress, model=${OmniRealtimeClient.DEFAULT_MODEL}, search=${if (enableWebSearch) "on" else "off"}, tools=${if (enableToolCalling) "on" else "off"}, cloneMode=$isCloneMode")
                     if (enableWebSearch && enableToolCalling) {
                         // applyMessage("AI对话: 当前配置请求 search=on 且 tools=on，但 Qwen Omni Realtime 协议规定两者不兼容，实际下发时将由服务端连接配置决定仅生效其中一项")
                     }
@@ -531,20 +606,20 @@ class CallActivity : BaseActivity() {
                 }
                 cameraFrameCapture?.requestImmediateCapture()
                 mainHandler.post {
-                    binding.tvSubtitle.text = getString(R.string.ai_call_listening)
+                    binding.tvSubtitle.text = "我在认真听${audienceAddress}说"
                 }
             }
 
             override fun onUserSpeechStopped() {
                 mainHandler.post {
-                    binding.tvSubtitle.text = getString(R.string.ai_call_thinking)
+                    binding.tvSubtitle.text = "我想一想，马上回答${audienceAddress}"
                 }
             }
 
             override fun onUserTranscript(transcript: String) {
                 applyMessage("用户语音转写: $transcript")
                 mainHandler.post {
-                    binding.tvSubtitle.text = getString(R.string.ai_call_user_said, transcript)
+                    binding.tvSubtitle.text = "${audienceAddress}刚才说：$transcript"
                 }
                 uploadConversationTurnAsync(FamilyBridgeService.ROLE_USER, transcript)
             }
@@ -569,15 +644,15 @@ class CallActivity : BaseActivity() {
             override fun onToolCallRequested(toolName: String, callId: String, argumentsJson: String) {
                 mainHandler.post {
                     binding.tvSubtitle.text = when (toolName) {
-                        "consult_psychology_knowledge_base" -> "我来帮您查一下更稳妥的照护资料。"
-                        "leave_message_for_family" -> "我来帮您把这句话记给家里人。"
-                        "fetch_family_messages" -> "我来帮您看看家里人的新留言。"
+                        "consult_psychology_knowledge_base" -> "我来帮${audienceAddress}查一下更稳妥的心理资料。"
+                        "leave_message_for_family" -> "我来帮${audienceAddress}把这句话记给家里人。"
+                        "fetch_family_messages" -> "我来帮${audienceAddress}看看家里人的新留言。"
                         "fetch_today_medication_plan" -> "我来看看今天的用药安排。"
-                        "confirm_medication_taken" -> "好的，我帮您把这次服药记下来。"
-                        "snooze_medication_reminder" -> "好的，稍后我再提醒您。"
+                        "confirm_medication_taken" -> "好的，我帮${audienceAddress}把这次服药记下来。"
+                        "snooze_medication_reminder" -> "好的，稍后我再提醒${audienceAddress}。"
                         "report_medication_problem", "request_family_help" -> "我先确认一下，再通知家里人关注。"
-                        "respond_to_check_in" -> "好的，我把您的平安回复告诉家里人。"
-                        else -> getString(R.string.ai_call_thinking)
+                        "respond_to_check_in" -> "好的，我把${audienceAddress}的平安回复告诉家里人。"
+                        else -> "我想一想，马上回答${audienceAddress}"
                     }
                 }
                 applyMessage("AI工具调用: $toolName, callId=$callId, arguments=$argumentsJson")
@@ -914,7 +989,7 @@ class CallActivity : BaseActivity() {
             "fetch_today_medication_plan", "confirm_medication_taken", "snooze_medication_reminder",
             "report_medication_problem", "respond_to_check_in", "request_family_help" -> executeFamilyCareTool(toolName, callId, arguments)
             else -> {
-                val outputText = "这个请求我还不能直接处理，您可以换一种说法再告诉我。"
+                val outputText = "这个请求我还不能直接处理，${audienceAddress}可以换一种说法再告诉我。"
                 runCatching {
                     familyBridgeService.recordToolCall(
                         toolName = toolName,
@@ -950,7 +1025,12 @@ class CallActivity : BaseActivity() {
         }
 
         return runCatching {
-            val result = psychologyKnowledgeAgentService.consultKnowledge(question, focus)
+            val result = psychologyKnowledgeAgentService.consultKnowledge(
+                question = question,
+                focus = focus,
+                knowledgeAsset = audienceProfile.knowledgeAsset,
+                audienceName = audienceProfile.displayName,
+            )
             familyBridgeService.recordToolCall(
                 toolName = "consult_psychology_knowledge_base",
                 arguments = arguments,
@@ -964,7 +1044,7 @@ class CallActivity : BaseActivity() {
             )
             ToolExecutionResult(result.outputText, FamilyBridgeService.STATUS_SUCCESS)
         }.getOrElse { error ->
-            val outputText = "权威照护资料查询暂时失败。请先基于安全原则回应：保持温和陪伴，避免给出确定性的医学结论；如果涉及持续恶化、明显痛苦、自伤他伤或急性危险，请建议尽快联系家属、医生或急救。"
+            val outputText = knowledgeQueryFallbackText()
             runCatching {
                 familyBridgeService.recordToolCall(
                     toolName = "consult_psychology_knowledge_base",
@@ -980,12 +1060,20 @@ class CallActivity : BaseActivity() {
         }
     }
 
+    private fun knowledgeQueryFallbackText(): String {
+        return when (audienceProfile.segment) {
+            AudienceSegment.TEEN -> "权威资料查询暂时失败。请先保持温和陪伴，不要给出确定性诊断；如果对方提到自伤他伤、被霸凌、虐待或急性危险，鼓励其联系监护人、老师或信任的成年人，紧急情况提示拨打120/110，并可提供12356心理援助热线。"
+            AudienceSegment.ADULT -> "权威资料查询暂时失败。请先保持温和陪伴，不要给出确定性诊断；如果涉及持续恶化、明显痛苦、自伤他伤或急性危险，建议其联系信任的人或专业心理服务，紧急情况拨打120/110，并可提供12356心理援助热线。"
+            AudienceSegment.SENIOR -> "权威照护资料查询暂时失败。请先基于安全原则回应：保持温和陪伴，避免给出确定性的医学结论；如果涉及持续恶化、明显痛苦、自伤他伤或急性危险，请建议尽快联系家属、医生或急救。"
+        }
+    }
+
     private fun executeLeaveMessageTool(callId: String, arguments: JSONObject): ToolExecutionResult {
         val message = arguments.optString("message").trim()
         val relation = arguments.optString("recipientRelation").trim().ifBlank { "家里人" }
 
         if (message.isEmpty()) {
-            val outputText = "我还没听清您想转告的话，您再慢慢说一遍，我帮您记下来。"
+            val outputText = "我还没听清${audienceAddress}想转告的话，${audienceAddress}再慢慢说一遍，我帮${audienceAddress}记下来。"
             runCatching {
                 familyBridgeService.recordToolCall(
                     toolName = "leave_message_for_family",
@@ -1039,7 +1127,7 @@ class CallActivity : BaseActivity() {
                 "家里人暂时还没有新的留言。"
             } else {
                 buildString {
-                    append(result.summaryText.ifBlank { "我帮您看了看，家里人有新的留言。" })
+                    append(result.summaryText.ifBlank { "我帮${audienceAddress}看了看，家里人有新的留言。" })
                     result.messages.take(requestedCount).forEachIndexed { index, message ->
                         append(" 第${index + 1}条：${message.content}")
                     }
@@ -1081,19 +1169,26 @@ class CallActivity : BaseActivity() {
                         for (index in 0 until agenda.doses.length()) { val item = agenda.doses.optJSONObject(index) ?: continue; append(" 编号${item.optString("id")}：${item.optString("name")}，${item.optString("dosage")}。") }
                     }
                 }
-                "confirm_medication_taken" -> { familyBridgeService.updateMedication(arguments.optString("doseId"), "TAKEN", "老人语音确认已服"); "已记录这次服药。请不要重复服用；如有不适，请立即告诉我或联系家人。" }
+                "confirm_medication_taken" -> { familyBridgeService.updateMedication(arguments.optString("doseId"), "TAKEN", "用户语音确认已服"); "已记录这次服药。请不要重复服用；如有不适，请立即告诉我或联系家人。" }
                 "snooze_medication_reminder" -> { val minutes = arguments.optInt("minutes", 10).coerceIn(1, 60); familyBridgeService.updateMedication(arguments.optString("doseId"), "SNOOZED", snoozeMinutes = minutes); "好的，已延后${minutes}分钟提醒。" }
                 "report_medication_problem" -> {
-                    val problem = arguments.optString("problem").ifBlank { "老人报告用药问题" }
+                    val problem = arguments.optString("problem").ifBlank { "用户报告用药问题" }
                     val doseId = arguments.optString("doseId")
                     if (doseId.isNotBlank() && doseId != "unknown") familyBridgeService.updateMedication(doseId, "NEEDS_FAMILY_CONFIRMATION", problem)
                     familyBridgeService.reportSafetyAlert("MEDICATION", "用药需要家人确认", problem, if (arguments.optString("severity") == "RED") "RED" else "ORANGE")
                     "已经通知家里人关注这次用药问题。我不能代替医生判断；如果情况紧急，请立即联系120或请身边的人帮助。"
                 }
-                "respond_to_check_in" -> { val status = arguments.optString("status").takeIf { it in listOf("SAFE", "NEEDS_CONTACT", "DECLINED") } ?: "NEEDS_CONTACT"; familyBridgeService.respondCheckIn(arguments.optString("checkInId"), status, arguments.optString("responseText")); "已经把您的回复告诉家里人。" }
+                "respond_to_check_in" -> { val status = arguments.optString("status").takeIf { it in listOf("SAFE", "NEEDS_CONTACT", "DECLINED") } ?: "NEEDS_CONTACT"; familyBridgeService.respondCheckIn(arguments.optString("checkInId"), status, arguments.optString("responseText")); "已经把${audienceAddress}的回复告诉家里人。" }
                 "request_family_help" -> {
-                    val summary = arguments.optString("summary").ifBlank { "老人请求家人联系" }
-                    familyBridgeService.reportSafetyAlert(arguments.optString("category").ifBlank { "HELP_REQUEST" }, "长辈请求家人关注", summary, if (arguments.optString("level") == "RED") "RED" else "ORANGE", summary)
+                    val summary = arguments.optString("summary").ifBlank {
+                        if (isSeniorMode) "长辈请求家人联系" else "用户请求家人联系"
+                    }
+                    val title = when (audienceProfile.segment) {
+                        AudienceSegment.TEEN -> "青少年请求家人关注"
+                        AudienceSegment.ADULT -> "用户请求家人关注"
+                        AudienceSegment.SENIOR -> "长辈请求家人关注"
+                    }
+                    familyBridgeService.reportSafetyAlert(arguments.optString("category").ifBlank { "HELP_REQUEST" }, title, summary, if (arguments.optString("level") == "RED") "RED" else "ORANGE", summary)
                     "已经通知家里人关注。这个提醒不是医学诊断；如果情况紧急，请立即联系120、110或请身边的人帮助。"
                 }
                 else -> error("不支持的照护工具")
@@ -1101,7 +1196,7 @@ class CallActivity : BaseActivity() {
             familyBridgeService.recordToolCall(toolName, arguments, outputText, FamilyBridgeService.STATUS_SUCCESS, callId, currentSessionId)
             ToolExecutionResult(outputText, FamilyBridgeService.STATUS_SUCCESS)
         }.getOrElse { error ->
-            val outputText = "照护信息暂时没有同步成功，请稍后再试；如果情况紧急，请直接联系家人或急救服务。"
+            val outputText = "家庭信息暂时没有同步成功，请稍后再试；如果情况紧急，请直接联系家人或急救服务。"
             runCatching { familyBridgeService.recordToolCall(toolName, arguments, outputText, FamilyBridgeService.STATUS_FAILURE, callId, currentSessionId) }
             applyMessage("家庭照护工具失败: ${error.message}")
             ToolExecutionResult(outputText, FamilyBridgeService.STATUS_FAILURE)
