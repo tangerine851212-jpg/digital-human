@@ -1,0 +1,59 @@
+安智伴知识库来源与使用说明
+版本：2026-10
+适用目录：test/src/main/assets/knowledge/
+
+通用免责声明
+本应用的知识库参考 WHO、UNICEF 等公开资料整理。WHO/UNICEF 未审核、认证或背书本应用，相关名称和标识不表示官方认可。知识内容仅用于心理健康教育、陪伴和求助引导，不构成医学诊断、治疗或用药建议；如遇紧急危险，请拨打 120/110 或联系 12356。知识包如有翻译或改写，以英文原版为准。
+
+======================================================================
+1. who_icope_2024.txt
+======================================================================
+原始名称：Integrated care for older people (ICOPE): guidance for person-centred assessment and pathways in primary care, second edition
+中文名称：老年人整合照护（ICOPE）：以人为本的评估和初级保健路径指南，第二版
+发布机构：World Health Organization (WHO)
+年份：2024
+ISBN：978-92-4-010372-6（电子版）；978-92-4-010373-3（印刷版）
+许可：CC BY-NC-SA 3.0 IGO
+建议引用：World Health Organization. Integrated care for older people (ICOPE): guidance for person-centred assessment and pathways in primary care, second edition. Geneva: WHO; 2024.
+官方页面：https://www.who.int/publications/i/item/9789240103726
+IRIS 记录：https://iris.who.int/handle/10665/380175
+使用说明：本文件保留 WHO 原文，未由安智伴改写或翻译；应用只将其作为老年模式的知识来源。
+
+======================================================================
+2. teen_support.txt
+======================================================================
+原始名称：Early Adolescent Skills for Emotions (EASE): group psychological help for young adolescents affected by distress in communities exposed to adversity
+中文名称：青少年情绪技能（EASE）：面向受逆境影响青少年的团体心理支持
+发布机构：World Health Organization (WHO) / United Nations Children's Fund (UNICEF)
+年份/版本：2023；Generic field-trial version 1.0
+适用对象：约 10–15 岁青少年
+ISBN：978-92-4-008275-5（电子版）；978-92-4-008276-2（印刷版）
+许可：CC BY-NC-SA 3.0 IGO
+建议引用：World Health Organization & United Nations Children's Fund (UNICEF). Early Adolescent Skills for Emotions (EASE): group psychological help for young adolescents affected by distress in communities exposed to adversity. Generic field-trial version 1.0. Geneva: WHO; 2023.
+官方页面：https://www.who.int/publications/i/item/9789240082755
+原文 PDF：https://iris.who.int/bitstream/handle/10665/374996/9789240082755-eng.pdf?sequence=1
+使用说明：本文件正文为 EASE 英文原文全文，未由安智伴改写或翻译。文件头部的内部说明不改变原文内容；WHO/UNICEF 未审核或背书本应用。
+
+======================================================================
+3. adult_support.txt
+======================================================================
+原始名称：Doing What Matters in Times of Stress: An Illustrated Guide
+中文名称：压力时期做重要的事：图解指南
+发布机构：World Health Organization (WHO)
+年份：2020
+本次导入文本：English version adapted for people from South Sudan（© HealthRight Uganda 2022；仅插图经改编，原版英文为准）
+许可：CC BY-NC-SA 3.0 IGO
+建议引用：World Health Organization. Doing what matters in times of stress: an illustrated guide. Geneva: World Health Organization; 2020. https://www.who.int/publications/i/item/9789240003927
+官方页面：https://www.who.int/publications/i/item/9789240003927
+IRIS 记录：https://iris.who.int/handle/10665/331901
+使用说明：本文件正文保留下载文本原文，未由安智伴改写或翻译。该文本是面向南苏丹人群的英文改编版本，改编不由 WHO 创建；WHO 原版英文为准。HealthRight Uganda 未审核或背书本应用。
+
+======================================================================
+许可与维护规则
+======================================================================
+1. 三份资料均按 CC BY-NC-SA 3.0 IGO 许可使用；不得用于商业用途，不得暗示 WHO、UNICEF 或 HealthRight Uganda 对本应用的认证或背书。
+2. 不得使用 WHO、UNICEF 的名称、标识或官方视觉元素暗示合作关系。
+3. 如对知识包进行翻译、摘编或其他改编，必须保留署名、许可声明和原文链接，并按相同许可分享；同时明确标注改编者。
+4. 更新知识包时，应保留原文件自带的版权页和引用信息，并同步更新本文件。
+5. SOURCES.txt 不参与运行时知识检索，也不会自动进入模型提示词；实际知识包由 AudienceProfileCatalog 中的 knowledgeAsset 路径选择。
+6. 当前运行时会将所选知识包全文拼入 qwen3.6-plus 的系统提示词；完整手册体积较大时，需关注上下文长度、延迟和费用。后续如需优化，应改为按问题检索相关章节。
