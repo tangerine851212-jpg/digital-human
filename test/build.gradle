@@ -27,6 +27,7 @@ android {
         versionCode 13
         versionName '4.1.1'
         buildConfigField "String", "DASHSCOPE_API_KEY", "\"${secrets.getProperty('DASHSCOPE_API_KEY', '')}\""
+        buildConfigField "String", "MONITOR_BASE_URL", "\"${secrets.getProperty('MONITOR_BASE_URL', 'https://digital-human.xn--876a.net')}\""
     }
 
     signingConfigs {
