@@ -90,17 +90,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <View
-        android:id="@+id/callBottomScrim"
-        android:layout_width="0dp"
-        android:layout_height="180dp"
-        android:background="@drawable/shape_call_bottom_scrim"
-        android:clickable="false"
-        android:focusable="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <TextView
         android:id="@+id/tvSubtitle"
         android:text=""
